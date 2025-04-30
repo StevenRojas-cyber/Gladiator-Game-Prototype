@@ -13,5 +13,8 @@ UCLASS()
 class GLADIATORGAME_API AMainGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
+
+public:
+	AMainGameMode();
 	
 };
