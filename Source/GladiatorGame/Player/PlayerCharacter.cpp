@@ -2,8 +2,9 @@
 
 
 #include "PlayerCharacter.h"
-
 #include "Camera/CameraComponent.h"
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
 #include "GameFramework/SpringArmComponent.h"
 
 // Sets default values
@@ -41,5 +42,43 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+	APlayerController* PlayerController = Cast<APlayerController>(Controller);
+	if (!IsValid(PlayerController)) return;
+
+	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
+	if (!IsValid(Subsystem)) return;
+
+	Subsystem->AddMappingContext(MappingContextComponent, 0);
+
+	UEnhancedInputComponent* Input = Cast<UEnhancedInputComponent>(PlayerInputComponent);
+	if (!IsValid(Input)) return;
+
+	Input->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Move);
+	Input->BindAction(LookAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Look);
+
 }
 
+void APlayerCharacter::Move(const FInputActionValue& InputActionValue)
+{
+	if (!bCanMove) return;
+	FVector2d MovementVector = InputActionValue.Get<FVector2d>();
+	if (!IsValid(Controller)) return;
+
+	const FRotator CurrentRotation = Controller->GetControlRotation();
+	const FRotator YawRotation = FRotator(0, CurrentRotation.Yaw, 0);
+
+	const FVector FowardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+	const FVector RightVector = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+
+	AddMovementInput(FowardDirection, MovementVector.Y);
+	AddMovementInput(RightVector, MovementVector.X);
+}
+
+void APlayerCharacter::Look(const FInputActionValue& InputActionValue)
+{
+	FVector2d LookDirection = InputActionValue.Get<FVector2d>();
+	if (!IsValid(Controller)) return;
+
+	AddControllerYawInput(LookDirection.X);
+	AddControllerPitchInput(LookDirection.Y);
+}
