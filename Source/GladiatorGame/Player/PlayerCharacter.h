@@ -7,6 +7,7 @@
 #include "GameFramework/Character.h"
 #include "PlayerCharacter.generated.h"
 
+class UAnimMontage;
 class UInputAction;
 class UCameraComponent;
 class USpringArmComponent;
@@ -36,14 +37,18 @@ public:
 	// Variables
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Variables)
 	bool bCanMove = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Variables)
+	int32 AttackCount = 0;
 	
-	// Components
+	// Camera Components
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera)
 	UCameraComponent* FollowCamera;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera)
 	USpringArmComponent* CameraBoom;
 
+	//Input Components
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
 	UInputMappingContext* MappingContextComponent;
 
@@ -56,10 +61,22 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
 	UInputAction* AttackAction;
 
-protected:
-	//Functions
+	//Animations
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = AttackMontages)
+	UAnimMontage* ComboMontage;
 
+protected:
+	
+	//Actions Functions
 	void Move(const FInputActionValue& InputActionValue);
 	void Look(const FInputActionValue& InputActionValue);
+	void Attack(const FInputActionValue& InputActionValue);
 
+	//Dynamic Functions
+	UFUNCTION()
+	void MontageNotifyBegin(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointNotifyPayload);
+
+	//Mechanics Functions
+	void HitDetech();
+	void InitAttack();
 };

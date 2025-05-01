@@ -5,6 +5,7 @@
 #include "Camera/CameraComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
 // Sets default values
@@ -17,6 +18,7 @@ APlayerCharacter::APlayerCharacter()
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>("CameraBoom");
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->bUsePawnControlRotation = true;
+	CameraBoom->bDoCollisionTest = false;
 	CameraBoom->TargetArmLength = 300.0f;
 	
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>("FollowCamera");
@@ -24,9 +26,10 @@ APlayerCharacter::APlayerCharacter()
 	FollowCamera->bUsePawnControlRotation = false;
 
 	//Class Attributes
-	bUseControllerRotationYaw = true;
+	bUseControllerRotationYaw = false;
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationRoll = false;
+	GetCharacterMovement()->bOrientRotationToMovement = true;
 
 
 }
@@ -35,7 +38,12 @@ APlayerCharacter::APlayerCharacter()
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance != nullptr)
+	{
+		AnimInstance->OnPlayMontageNotifyBegin.AddDynamic(this, &APlayerCharacter::MontageNotifyBegin);
+	}
 }
 
 // Called every frame
@@ -63,9 +71,12 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 	Input->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Move);
 	Input->BindAction(LookAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Look);
-
+	Input->BindAction(AttackAction, ETriggerEvent::Started, this, &APlayerCharacter::Attack);
 }
 
+
+//ACTIONS//
+///////////////////////////
 void APlayerCharacter::Move(const FInputActionValue& InputActionValue)
 {
 	if (!bCanMove) return;
@@ -90,3 +101,52 @@ void APlayerCharacter::Look(const FInputActionValue& InputActionValue)
 	AddControllerYawInput(LookDirection.X);
 	AddControllerPitchInput(LookDirection.Y);
 }
+
+void APlayerCharacter::Attack(const FInputActionValue& InputActionValue)
+{
+
+	InitAttack();
+}
+
+///////////////////////////
+
+
+//DYNAMICS
+///////////////////////////
+void APlayerCharacter::MontageNotifyBegin(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointNotifyPayload)
+{
+	AttackCount--;
+	if (AttackCount < 0)
+	{
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		if (!IsValid(AnimInstance)) return;
+		
+		AnimInstance->Montage_Stop(0.4f,ComboMontage);
+	}
+}
+
+///////////////////////////
+
+//MECHANICS
+///////////////////////////
+void APlayerCharacter::HitDetech()
+{
+	
+}
+
+void APlayerCharacter::InitAttack()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (!IsValid(AnimInstance)) return;
+
+	if (AnimInstance->IsAnyMontagePlaying())
+	{
+		AttackCount = 1;
+	}
+	else
+	{
+		AnimInstance->Montage_Play(ComboMontage, 1.0f);
+	}
+}
+
+///////////////////////////
