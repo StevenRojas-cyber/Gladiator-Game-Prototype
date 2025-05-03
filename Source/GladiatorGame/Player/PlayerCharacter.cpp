@@ -5,6 +5,7 @@
 #include "Camera/CameraComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
@@ -129,9 +130,24 @@ void APlayerCharacter::MontageNotifyBegin(FName NotifyName, const FBranchingPoin
 
 //MECHANICS
 ///////////////////////////
-void APlayerCharacter::HitDetech()
+void APlayerCharacter::HitDetech(FName Start, FName End, float Radius)
 {
-	
+	FVector TraceStart;
+	FVector TraceEnd;
+
+	TraceStart = GetMesh()->GetSocketLocation(Start);
+	TraceEnd = GetMesh()->GetSocketLocation(End);
+
+	TArray<AActor*> ActorsIgnore;
+	ActorsIgnore.Add(this);
+	FHitResult HitActor;
+
+	UKismetSystemLibrary::SphereTraceSingle(GetWorld(), TraceStart, TraceEnd, Radius, UEngineTypes::ConvertToTraceType(ECC_Visibility), false, ActorsIgnore, EDrawDebugTrace::ForDuration, HitActor, true, FLinearColor::Red, FLinearColor::Green, 5);
+
+	if (HitActor.bBlockingHit)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, HitActor.GetActor()->GetName());
+	}
 }
 
 void APlayerCharacter::InitAttack()
@@ -145,7 +161,7 @@ void APlayerCharacter::InitAttack()
 	}
 	else
 	{
-		AnimInstance->Montage_Play(ComboMontage, 1.0f);
+		AnimInstance->Montage_Play(ComboMontage, 1.5f);
 	}
 }
 

@@ -77,6 +77,8 @@ protected:
 	void MontageNotifyBegin(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointNotifyPayload);
 
 	//Mechanics Functions
-	void HitDetech();
 	void InitAttack();
+
+public:
+	void HitDetech(FName Start, FName End, float Radius);
 };
