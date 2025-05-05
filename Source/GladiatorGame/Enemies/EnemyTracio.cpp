@@ -3,6 +3,8 @@
 
 #include "EnemyTracio.h"
 
+#include "GameFramework/CharacterMovementComponent.h"
+
 // Sets default values
 AEnemyTracio::AEnemyTracio()
 {
@@ -11,12 +13,16 @@ AEnemyTracio::AEnemyTracio()
 
 	SwordMeshComp = CreateDefaultSubobject<UStaticMeshComponent>("SwordMesh");
 	SwordMeshComp->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, "SwordSocket_2");
+	//SwordMeshComp->SetCollisionProfileName()
 	
 	ShieldMeshComp = CreateDefaultSubobject<UStaticMeshComponent>("ShieldMesh");
 	ShieldMeshComp->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, "ShieldSocket_2");
 	
 	HelmentMeshComp = CreateDefaultSubobject<UStaticMeshComponent>("HelmetMesh");
 	HelmentMeshComp->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, "HelmentSocket_2");
+
+	Tags.Add("Enemy");
+	GetCharacterMovement()->MaxWalkSpeed = 300.0f;
 }
 
 // Called when the game starts or when spawned

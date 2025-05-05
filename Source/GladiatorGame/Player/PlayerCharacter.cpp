@@ -32,7 +32,7 @@ APlayerCharacter::APlayerCharacter()
 	bUseControllerRotationRoll = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 
-
+	Tags.Add("Player");
 }
 
 // Called when the game starts or when spawned
@@ -144,6 +144,7 @@ void APlayerCharacter::HitDetech(FName Start, FName End, float Radius)
 
 	UKismetSystemLibrary::SphereTraceSingle(GetWorld(), TraceStart, TraceEnd, Radius, UEngineTypes::ConvertToTraceType(ECC_Visibility), false, ActorsIgnore, EDrawDebugTrace::ForDuration, HitActor, true, FLinearColor::Red, FLinearColor::Green, 5);
 
+	
 	if (HitActor.bBlockingHit)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, HitActor.GetActor()->GetName());
