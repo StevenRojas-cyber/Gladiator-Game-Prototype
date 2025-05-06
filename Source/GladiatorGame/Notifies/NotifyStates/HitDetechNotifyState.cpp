@@ -18,13 +18,13 @@ void UHitDetechNotifyState::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSe
 		APlayerCharacter* OwnerCharacter = Cast<APlayerCharacter>(MeshComp->GetOwner());
 		if (!IsValid(OwnerCharacter)) return;
 		
-		OwnerCharacter->HitDetech("hand_r", "hand_r", 30);
+		OwnerCharacter->HitDetech("hand_r", "hand_r", 40);
 	}
 	else if (CurrentAnimation == "Kick")
 	{
 		APlayerCharacter* OwnerCharacter = Cast<APlayerCharacter>(MeshComp->GetOwner());
 		if (!IsValid(OwnerCharacter)) return;
 		
-		OwnerCharacter->HitDetech("foot_r", "foot_r", 30);
+		OwnerCharacter->HitDetech("foot_r", "foot_r", 40);
 	}
 }
