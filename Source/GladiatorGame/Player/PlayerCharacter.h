@@ -80,5 +80,5 @@ protected:
 	void InitAttack();
 
 public:
-	void HitDetech(FName Start, FName End, float Radius);
+	void HitDetech(FName Start, FName End, float Radius, float Time);
 };

@@ -130,7 +130,7 @@ void APlayerCharacter::MontageNotifyBegin(FName NotifyName, const FBranchingPoin
 
 //MECHANICS
 ///////////////////////////
-void APlayerCharacter::HitDetech(FName Start, FName End, float Radius)
+void APlayerCharacter::HitDetech(FName Start, FName End, float Radius, float Time)
 {
 	FVector TraceStart;
 	FVector TraceEnd;
@@ -142,7 +142,7 @@ void APlayerCharacter::HitDetech(FName Start, FName End, float Radius)
 	ActorsIgnore.Add(this);
 	FHitResult HitActor;
 
-	UKismetSystemLibrary::SphereTraceSingle(GetWorld(), TraceStart, TraceEnd, Radius, UEngineTypes::ConvertToTraceType(ECC_Visibility), false, ActorsIgnore, EDrawDebugTrace::ForDuration, HitActor, true, FLinearColor::Red, FLinearColor::Green, 5);
+	UKismetSystemLibrary::SphereTraceSingle(GetWorld(), TraceStart, TraceEnd, Radius, UEngineTypes::ConvertToTraceType(ECC_Visibility), false, ActorsIgnore, EDrawDebugTrace::ForDuration, HitActor, true, FLinearColor::Red, FLinearColor::Green, Time);
 
 	
 	if (HitActor.bBlockingHit)

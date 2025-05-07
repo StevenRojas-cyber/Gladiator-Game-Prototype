@@ -4,6 +4,8 @@
 #include "EnemyTracio.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/KismetArrayLibrary.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 // Sets default values
 AEnemyTracio::AEnemyTracio()
@@ -32,6 +34,7 @@ void AEnemyTracio::BeginPlay()
 	
 }
 
+
 // Called every frame
 void AEnemyTracio::Tick(float DeltaTime)
 {
@@ -46,3 +49,22 @@ void AEnemyTracio::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 }
 
+void AEnemyTracio::EnemyHitDetech(FName Start, FName End, float Radius, float Time)
+{
+	FVector TraceStart;
+	FVector TraceEnd;
+
+	TraceStart = GetMesh()->GetSocketLocation(Start);
+	TraceEnd = GetMesh()->GetSocketLocation(End);
+
+	TArray<AActor*> ActorsToIgnore;
+	ActorsToIgnore.Add(this);
+	FHitResult HitActor;
+
+	UKismetSystemLibrary::SphereTraceSingle(GetWorld(), TraceStart, TraceEnd, Radius, UEngineTypes::ConvertToTraceType(ECC_Visibility), false, ActorsToIgnore, EDrawDebugTrace::ForDuration, HitActor, true, FLinearColor::Red, FLinearColor::Green, Time);
+
+	if (HitActor.bBlockingHit)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Orange, HitActor.GetActor()->GetName());
+	}
+}

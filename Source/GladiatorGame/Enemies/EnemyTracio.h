@@ -38,4 +38,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Equipment)
 	UStaticMeshComponent* HelmentMeshComp;
 
+	//Functions
+	void EnemyHitDetech(FName Start, FName End, float Radius, float Time);
+
 };
