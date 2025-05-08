@@ -39,6 +39,9 @@ public:
 	bool bCanMove = true;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Variables)
+	bool bIsAttacking = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Variables)
 	int32 AttackCount = 0;
 	
 	// Camera Components

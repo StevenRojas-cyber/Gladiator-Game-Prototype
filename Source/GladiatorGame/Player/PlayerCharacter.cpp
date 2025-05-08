@@ -105,8 +105,12 @@ void APlayerCharacter::Look(const FInputActionValue& InputActionValue)
 
 void APlayerCharacter::Attack(const FInputActionValue& InputActionValue)
 {
-
 	InitAttack();
+	/*if (bIsAttacking) return;
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (!IsValid(AnimInstance)) return;*/
+	
+	
 }
 
 ///////////////////////////

@@ -63,23 +63,3 @@ void UHitDetechNotifyState::EnemyHitDetech(UAnimSequenceBase* CurrentSequence)
 		OwnerEnemy->EnemyHitDetech("SwordSocket_2", "SwordSocket_2", 40, 2);
 	}
 }
-
-
-/*FName CurrentAnimation = FName(*Animation->GetName());
-	
-	if (CurrentAnimation == NAME_None) return;
-
-	if (CurrentAnimation == "Slash_1" || CurrentAnimation == "Slash_2")
-	{
-		APlayerCharacter* OwnerCharacter = Cast<APlayerCharacter>(MeshComp->GetOwner());
-		if (!IsValid(OwnerCharacter)) return;
-		
-		OwnerCharacter->HitDetech("hand_r", "hand_r", 40);
-	}
-	else if (CurrentAnimation == "Kick")
-	{
-		APlayerCharacter* OwnerCharacter = Cast<APlayerCharacter>(MeshComp->GetOwner());
-		if (!IsValid(OwnerCharacter)) return;
-		
-		OwnerCharacter->HitDetech("foot_r", "foot_r", 40);
-	}*/
