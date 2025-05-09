@@ -25,7 +25,7 @@ APlayerCharacter::APlayerCharacter()
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>("FollowCamera");
 	FollowCamera->SetupAttachment(CameraBoom);
 	FollowCamera->bUsePawnControlRotation = false;
-
+	
 	//Class Attributes
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationPitch = false;
@@ -39,11 +39,12 @@ APlayerCharacter::APlayerCharacter()
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	if (AnimInstance != nullptr)
+	
+	PlayerAnimInstance = GetMesh()->GetAnimInstance();
+	if (PlayerAnimInstance != nullptr)
 	{
-		AnimInstance->OnPlayMontageNotifyBegin.AddDynamic(this, &APlayerCharacter::MontageNotifyBegin);
+		PlayerAnimInstance->OnMontageEnded.AddDynamic(this, &APlayerCharacter::OnMontageEnd);
+		PlayerAnimInstance->OnPlayMontageNotifyBegin.AddDynamic(this, &APlayerCharacter::MontageNotifyBegin);
 	}
 }
 
@@ -52,6 +53,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	GEngine->AddOnScreenDebugMessage(-1, 0.001f, FColor::Green, FString::Printf(TEXT("IsAttacking = %s"), bIsAttacking ? TEXT("true") : TEXT("false")));
 }
 
 // Called to bind functionality to input
@@ -105,12 +107,7 @@ void APlayerCharacter::Look(const FInputActionValue& InputActionValue)
 
 void APlayerCharacter::Attack(const FInputActionValue& InputActionValue)
 {
-	InitAttack();
-	/*if (bIsAttacking) return;
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	if (!IsValid(AnimInstance)) return;*/
-	
-	
+	InitAttack(2.0f);
 }
 
 ///////////////////////////
@@ -120,14 +117,8 @@ void APlayerCharacter::Attack(const FInputActionValue& InputActionValue)
 ///////////////////////////
 void APlayerCharacter::MontageNotifyBegin(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointNotifyPayload)
 {
-	AttackCount--;
-	if (AttackCount < 0)
-	{
-		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-		if (!IsValid(AnimInstance)) return;
-		
-		AnimInstance->Montage_Stop(0.4f,ComboMontage);
-	}
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, NotifyName.ToString());
+	bIsAttacking = false;
 }
 
 ///////////////////////////
@@ -155,19 +146,61 @@ void APlayerCharacter::HitDetech(FName Start, FName End, float Radius, float Tim
 	}
 }
 
-void APlayerCharacter::InitAttack()
+void APlayerCharacter::OnMontageEnd(UAnimMontage* Montage, bool bInterrupted)
 {
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	if (!IsValid(AnimInstance)) return;
-
-	if (AnimInstance->IsAnyMontagePlaying())
+	if (bInterrupted)
 	{
-		AttackCount = 1;
+		StartRetriggerableDelay(1.5f);
 	}
 	else
 	{
-		AnimInstance->Montage_Play(ComboMontage, 1.5f);
+		AttackCount = 0;
 	}
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, "Fin del montage");
 }
 
-///////////////////////////
+
+void APlayerCharacter::InitAttack(float AttackVelocity)
+{
+	if (!IsValid(PlayerAnimInstance)) return;
+	if (bIsAttacking) return;
+	bIsAttacking = true;
+
+	switch (AttackCount)
+	{
+		case 0:
+			PlayerAnimInstance->Montage_Play(FirstAttackMontage,AttackVelocity);
+			break;
+
+		case 1:
+			PlayerAnimInstance->Montage_Play(SecondAttackMontage, AttackVelocity);
+			break;
+
+		case 2:
+			PlayerAnimInstance->Montage_Play(ThirdAttackMontage, AttackVelocity);
+			break;
+		default:
+			break;
+	}
+
+	AttackCount ++;
+}
+
+
+void APlayerCharacter::StartRetriggerableDelay(float Duration)
+{
+	if (bTimerActive)
+	{
+		GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
+	}
+
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &APlayerCharacter::OnDelayCompleted, Duration, false);
+	bTimerActive = true;
+}
+
+void APlayerCharacter::OnDelayCompleted()
+{
+	bIsAttacking = false;
+	AttackCount = 0;
+}
+

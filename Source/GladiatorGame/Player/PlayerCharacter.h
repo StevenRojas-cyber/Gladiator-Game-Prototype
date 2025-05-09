@@ -9,6 +9,7 @@
 
 class UAnimMontage;
 class UInputAction;
+class UAnimInstance;
 class UCameraComponent;
 class USpringArmComponent;
 class UInputMappingContext;
@@ -51,7 +52,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera)
 	USpringArmComponent* CameraBoom;
 
-	//Input Components
+	// Input Components
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
 	UInputMappingContext* MappingContextComponent;
 
@@ -64,24 +65,44 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
 	UInputAction* AttackAction;
 
-	//Animations
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = AttackMontages)
-	UAnimMontage* ComboMontage;
+	// Animations
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animations)
+	UAnimInstance* PlayerAnimInstance;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animations)
+	UAnimMontage* FirstAttackMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animations)
+	UAnimMontage* SecondAttackMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animations)
+	UAnimMontage* ThirdAttackMontage;
 
 protected:
 	
-	//Actions Functions
+	// Actions Functions
 	void Move(const FInputActionValue& InputActionValue);
 	void Look(const FInputActionValue& InputActionValue);
 	void Attack(const FInputActionValue& InputActionValue);
 
-	//Dynamic Functions
+	// Dynamic Functions
 	UFUNCTION()
 	void MontageNotifyBegin(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointNotifyPayload);
 
-	//Mechanics Functions
-	void InitAttack();
+	// Mechanics Functions
+	void InitAttack(float AttackVelocity);
 
 public:
 	void HitDetech(FName Start, FName End, float Radius, float Time);
+
+	UFUNCTION()
+	void OnMontageEnd(UAnimMontage* Montage, bool bInterrupted);
+
+	//Retriggerable Delay Function
+	FTimerHandle TimerHandle;
+	bool bTimerActive = false;
+	
+	void StartRetriggerableDelay(float Duration);
+	void OnDelayCompleted();
+
 };
