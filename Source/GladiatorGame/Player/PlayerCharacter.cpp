@@ -150,10 +150,12 @@ void APlayerCharacter::OnMontageEnd(UAnimMontage* Montage, bool bInterrupted)
 {
 	if (bInterrupted)
 	{
+		bCanMove = true;
 		StartRetriggerableDelay(1.5f);
 	}
 	else
 	{
+		bCanMove = true;
 		AttackCount = 0;
 	}
 		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Blue, "Fin del montage");
@@ -165,6 +167,7 @@ void APlayerCharacter::InitAttack(float AttackVelocity)
 	if (!IsValid(PlayerAnimInstance)) return;
 	if (bIsAttacking) return;
 	bIsAttacking = true;
+
 
 	switch (AttackCount)
 	{

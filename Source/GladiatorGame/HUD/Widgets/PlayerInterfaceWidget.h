@@ -10,6 +10,7 @@
 
 class UTextBlock;
 class UCanvasPanel;
+class UProgressBar;
 
 /**
  * 
@@ -26,7 +27,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = UI, meta = (BindWidget))
 	UTextBlock* HP;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = UI, meta = (BindWidget))
+	UTextBlock* CurrentHP;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = UI, meta = (BindWidget))
+	UProgressBar* HealthBar;
+
 	//FUNCTIONS
 	virtual void NativeConstruct() override;
-	
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 };

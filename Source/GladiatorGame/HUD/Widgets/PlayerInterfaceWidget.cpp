@@ -7,3 +7,9 @@ void UPlayerInterfaceWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 }
+
+void UPlayerInterfaceWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+	Super::NativeTick(MyGeometry, InDeltaTime);
+	
+}
